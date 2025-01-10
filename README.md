@@ -25,6 +25,12 @@ Además, se lleva un registro detallado de métricas en algunos microservicios, 
 ⚠️ **Nota:** Cambia el **host** y el **puerto** según el microservicio correspondiente.
 
 ---
+# Recursos
+En la carpeta resources encontrarás una colección de Postman diseñada para interactuar con los microservicios de forma individual o probar el flujo completo entre el producer y el consumer.
+
+Además, al iniciar los microservicios de cliente y productos, se generan automáticamente datos de prueba, lo que permite utilizarlos sin necesidad de registrar información manualmente.
+
+---
 
 ## 📦 Dependencias Relevantes
 
