@@ -1,6 +1,6 @@
 # 🚀 Microservices Architecture with Spring WebFlux
 
-Este repositorio contiene una arquitectura basada en **microservicios** desarrollada con **Java 21**, sin ninguna vulnerabilidad de dependencia a la fecha 📅 **10/02/2025**. 
+Este repositorio contiene una arquitectura basada en **microservicios** desarrollada con **Java 21**, sin ninguna vulnerabilidad media de dependencia a la fecha 📅 **10/02/2025**. 
 
 ## 🧩 Microservicios Incluidos
 
