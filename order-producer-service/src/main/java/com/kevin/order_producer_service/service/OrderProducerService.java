@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -27,7 +28,6 @@ public class OrderProducerService {
 
     public OrderProducerService(KafkaTemplate<String, String> kafkaTemplate, MeterRegistry meterRegistry, ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
-        // Configuración de métricas
         this.successfulOrdersCounter = Counter.builder("orders.producer.success")
                 .description("Número de pedidos enviados exitosamente")
                 .tag("type", "success")
@@ -41,7 +41,7 @@ public class OrderProducerService {
     }
 
     /**
-     * Publica un mensaje en Kafka de manera reactiva
+     * Publica un mensaje en Kafka
      *
      * @param orderRequest El mensaje a enviar.
      * @return Mono<ResponseDto> que representa el resultado de la operación.
@@ -49,16 +49,9 @@ public class OrderProducerService {
     public Mono<ResponseDto> publishTransactionalMessage(OrderRequestDto orderRequest) {
         Instant start = Instant.now();
 
-        return Mono.fromFuture(() -> kafkaTemplate.executeInTransaction(kafkaOperations -> {
-                    try {
-                        String orderJson = serializeToJson(orderRequest);
-                        return kafkaOperations.send(topic, orderRequest.getOrderId(), orderJson);
-
-                    } catch (Exception e) {
-                        log.error("Error al construir el Kafka producer: {}", e.getMessage());
-                        throw new KafkaCustomException("Kafka no disponible. Verifica la conexión al broker.", e);
-                    }
-                }))
+        return Mono.fromCallable(() -> serializeToJson(orderRequest))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(orderJson -> Mono.fromFuture(kafkaTemplate.send(topic, orderRequest.getOrderId(), orderJson)))
                 .timeout(Duration.ofSeconds(15))
                 .flatMap(result -> {
                     Instant end = Instant.now();
@@ -79,7 +72,7 @@ public class OrderProducerService {
                     log.error("Error al enviar mensaje: topic={}, duration={}ms, error={}",
                             topic, Duration.between(start, end).toMillis(), error.getMessage());
                     failedOrdersCounter.increment();
-                    throw new KafkaCustomException("Kafka no disponible: "+error.getMessage(), error);
+                    return Mono.error(new KafkaCustomException("Kafka no disponible: " + error.getMessage(), error));
                 });
     }
 

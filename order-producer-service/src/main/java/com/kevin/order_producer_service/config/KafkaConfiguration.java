@@ -36,7 +36,6 @@ public class KafkaConfiguration {
         props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 30000);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "order-producer"); // Transacción habilitada
 
         return props;
     }
@@ -45,7 +44,6 @@ public class KafkaConfiguration {
     public ProducerFactory<String, String> producerFactory(MeterRegistry meterRegistry) {
         DefaultKafkaProducerFactory<String, String> factory =
                 new DefaultKafkaProducerFactory<>(producerProperties());
-        factory.transactionCapable(); // Habilitar soporte transaccional
         factory.addListener(new MicrometerProducerListener<>(meterRegistry));
         return factory;
     }
