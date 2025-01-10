@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "4dbd666b-0547-4abe-bad9-8a656ea36313",
+		"name": "prueba tecnica",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28580199"
+	},
+	"item": [
+		{
+			"name": "producer",
+			"item": [
+				{
+					"name": "publicar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"orderId\": \"1113\",\r\n  \"clientId\": \"C001\",\r\n  \"products\": [\r\n    {\r\n        \"productId\":\"P001\",\r\n        \"name\":\"Laptop\",\r\n        \"price\":1200.99\r\n    },\r\n    {\r\n        \"productId\":\"P002\",\r\n        \"name\":\"Iphone\",\r\n        \"price\":899.49\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/orders/publish",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"orders",
+								"publish"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "500 broker apagado",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"orderId\": \"12345\",\r\n  \"clientId\": \"67890\",\r\n  \"productIds\": [\"prod-001\", \"prod-002\", \"prod-003\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/orders/publish",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"orders",
+										"publish"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "181"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2025-01-08T16:34:07.390341\",\n    \"status\": 500,\n    \"error\": \"Kafka Producer Error\",\n    \"message\": \"Kafka no disponible. Verifica la conexión al broker.\",\n    \"path\": \"/api/orders/publish\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "products service",
+			"item": [
+				{
+					"name": "get list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/api/products/list?ids=P001&ids=P002&ids=P009",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"api",
+								"products",
+								"list"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "P001"
+								},
+								{
+									"key": "ids",
+									"value": "P002"
+								},
+								{
+									"key": "ids",
+									"value": "P009"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "400 bad request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/products/list?ids=P001&ids=P002&ids=P00100",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"products",
+										"list"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "P001"
+										},
+										{
+											"key": "ids",
+											"value": "P002"
+										},
+										{
+											"key": "ids",
+											"value": "P00100"
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "142"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"timestamp\": \"2025-01-08T21:31:38.4402576\",\n    \"status\": 400,\n    \"message\": \"Algunos productos no existen en el catálogo.\",\n    \"path\": \"/api/products/list\"\n}"
+						},
+						{
+							"name": "200 ok",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8082/api/products/list?ids=P001&ids=P002&ids=P009",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"products",
+										"list"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "P001"
+										},
+										{
+											"key": "ids",
+											"value": "P002"
+										},
+										{
+											"key": "ids",
+											"value": "P009"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "157"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"productId\": \"P001\",\n        \"name\": \"Laptop\",\n        \"price\": 1200.99\n    },\n    {\n        \"productId\": \"P002\",\n        \"name\": \"Iphone\",\n        \"price\": 899.49\n    },\n    {\n        \"productId\": \"P009\",\n        \"name\": \"Camara\",\n        \"price\": 799\n    }\n]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "client service",
+			"item": [
+				{
+					"name": "get client",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/api/clients/C001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"api",
+								"clients",
+								"C001"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 ok",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8083/api/clients/C001",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8083",
+									"path": [
+										"api",
+										"clients",
+										"C001"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "111"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"clientId\": \"C001\",\n    \"name\": \"Kevin Escobar\",\n    \"address\": \"Mexico\",\n    \"isActive\": true,\n    \"purchaseHistory\": [\n        \"P001\",\n        \"P002\"\n    ]\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}

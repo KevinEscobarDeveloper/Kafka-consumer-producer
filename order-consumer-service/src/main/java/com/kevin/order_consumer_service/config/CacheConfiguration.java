@@ -23,7 +23,9 @@ public class CacheConfiguration {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://" + redisHost + ":" + redisPort);
+                .setAddress("redis://" + redisHost + ":" + redisPort)
+                .setConnectionPoolSize(10)
+                .setConnectionMinimumIdleSize(5);
         return Redisson.create(config);
     }
     @Bean

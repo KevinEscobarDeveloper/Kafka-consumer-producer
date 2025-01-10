@@ -1,0 +1,23 @@
+# Visual Studio specific
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+*.db
+*.suo
+*.user
+*.pdb
+*.ipch
+*.log
+*.obj
+*.tlog
+*.idb
+*.opendb
+*.sou
+*.cache
+*.csproj.user
+*.csproj~
+*.sln.docstates
+*.userosscache
+*.unsaved
+*.[pP][dD][bB]
+.idea/
