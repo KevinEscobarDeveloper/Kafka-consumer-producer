@@ -36,6 +36,8 @@ public class ConsumerServiceImpl implements IConsumerService {
     private final ObjectMapper mapper;
     private final ILockService lockService;
     private final MeterRegistry meterRegistry;
+    private static final int MAX_RETRIES = 3;
+    private static final long MAX_PROCESSING_TIME = 20000;
 
     @Override
     @KafkaListener(topics = "orders-topic", groupId = "order-group")
@@ -53,36 +55,33 @@ public class ConsumerServiceImpl implements IConsumerService {
         Instant start = Instant.now();
         String clientId = orderDto.getClientId();
 
-        int maxRetries = 3;
-        long maxProcessingTime = 20000; // Tiempo máximo para todo el procesamiento en milisegundos
-
-        Mono<String> lockMono = lockService.acquireLock(clientId)
-                .retryWhen(Retry.backoff(maxRetries, Duration.ofSeconds(2))
-                        .jitter(0.75)
-                        .doBeforeRetry(retrySignal ->
-                                log.warn("Reintento {} para adquirir lock para clientId: {}, error: {}",
-                                        retrySignal.totalRetries() + 1, clientId, retrySignal.failure().getMessage())
-                        )
-                        .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
-                                new RequestCustomException("No se pudo adquirir el lock después de múltiples intentos", 500)
-                        )
-                );
-
-        return lockMono
+        return lockService.acquireLock(clientId)
                 .flatMap(lockId -> processOrder(orderDto)
                         .doOnSuccess(v -> {
                             Instant end = Instant.now();
-
-                            assert meterRegistry != null;
-                            meterRegistry.timer("order.duration")
-                                    .record(Duration.between(start, end));
+                            meterRegistry.timer("order.duration").record(Duration.between(start, end));
                         })
+                        .doOnError(error -> log.error("Error al procesar la orden {}: {}", orderDto.getOrderId(), error.getMessage()))
+                        .retryWhen(Retry.backoff(MAX_RETRIES, Duration.ofSeconds(2))
+                                .jitter(0.75)
+                                .doBeforeRetry(retrySignal -> log.warn(
+                                        "Reintento {} para procesar orden {}. Error: {}",
+                                        retrySignal.totalRetries() + 1,
+                                        orderDto.getOrderId(),
+                                        retrySignal.failure().getMessage()
+                                ))
+                                .onRetryExhaustedThrow((spec, retrySignal) ->
+                                        new RequestCustomException(
+                                                "No se pudo procesar la orden después de múltiples intentos",
+                                                500
+                                        )
+                                )
+                        )
+                        .onErrorResume(error -> lockService.releaseLock(clientId, lockId).then(Mono.error(error)))
                         .then(lockService.releaseLock(clientId, lockId))
                 )
-                .timeout(Duration.ofMillis(maxProcessingTime))
-                .doOnError(error -> {
-                    log.error("Error procesando la orden {}: {}", orderDto.getOrderId(), error.getMessage());
-                });
+                .timeout(Duration.ofMillis(MAX_PROCESSING_TIME))
+                .doOnError(error -> log.error("Timeout o error procesando la orden {}: {}", orderDto.getOrderId(), error.getMessage()));
     }
 
 
