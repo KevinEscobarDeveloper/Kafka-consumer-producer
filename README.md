@@ -50,7 +50,7 @@ Las principales dependencias utilizadas en el proyecto son:
 - **Documentación API**: Todos los microservicios tienen Swagger integrado.
 - **Procesos Reactivos**: Uso de Spring WebFlux para manejar procesos no bloqueantes.
 - **Registro de Métricas**: Métricas disponibles mediante Actuator en algunos microservicios.
-- **Dependencias Seguras**: Sin vulnerabilidades de dependencia al 10/02/2025.
+- **Dependencias Seguras**: Sin vulnerabilidades de dependencia nivel medio al 10/01/2025.
 
 ---
 
