@@ -55,8 +55,6 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, 1000);
         props.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 10000);
         props.put(ConsumerConfig.RETRY_BACKOFF_MS_CONFIG, 1000);
-
-        // Puedes agregar más propiedades según tus necesidades
         return props;
     }
 
